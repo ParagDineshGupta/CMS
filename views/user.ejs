@@ -1,0 +1,18 @@
+<html>
+<head>
+	<title><%= title %></title>
+
+	<script type="text/javascript">
+	XMLHttpRequest.setRequestHeader('token',<%= token %>);
+	
+	</script>
+</head>
+<body>
+	<a href="/vendor?token=<%= token %>">Vendor</a>
+<a href="/contractor?token=<%= token %>">Contractor</a>
+
+
+<%= data[0].CompanyName %>
+
+</body>
+</html>

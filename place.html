@@ -1,0 +1,165 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+
+
+
+<style type="text/css">
+
+@import url('https://fonts.googleapis.com/css?family=Indie+Flower');
+
+.section.no-pad-bot
+{
+    padding-bottom:14px !important;
+}
+#show-case a
+{
+  text-decoration: underline;
+  color:#600;
+}
+#location
+{
+    white-space: nowrap !important;
+}
+</style>
+
+
+    <div class="section no-pad-bot yellow lighten-3">
+        <div id="show-case" class="container">
+            <div class="section">
+                <!--   Icon Section   -->
+                <div class="row">
+                    <div class="col s12 m12">
+                        <div class="icon-block">
+                            <h2 class="center black-text light header subtitle"><i class="fa fa-file-code-o"></i> <a href="http://battuta.medunes.net" target="_blank">Battuta</a> Show case</h2>
+                            <div class="col s4">
+                                <label class="left-align" for="country">Country</label>
+                                <select class="brwoser-default" id="country"></select>
+                            </div>
+
+                            <div class="col s4">
+                                <label class="left-align" for="region">Region</label>
+                                <select class="brwoser-default" id="region"></select>    
+                            </div>
+
+                            <div class="col s4">
+                                 <label class="left-align" for="city">City</label>
+                                <select class="autocomplete" id="city"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="row">
+                    <div class="col s2 m2"></div>  
+                    <div class="col s6 m6">
+                        <div id="location" class="orange lighten-1 black-text"></div>  
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js'></script>
+    <script type="text/javascript">
+
+    //-------------------------------SELECT CASCADING-------------------------//
+    var currentCities=[];
+// This is a demo API key that can only be used for a short period of time, and will be unavailable soon. You should rather request your API key (free)  from http://battuta.medunes.net/   
+var BATTUTA_KEY="09aaa5092cdc67ce5111ba51b48ae061";
+    // Populate country select box from battuta API
+    url="https://battuta.medunes.net/api/country/all/?key="+BATTUTA_KEY+"&callback=?";
+    $.getJSON(url,function(countries)
+    {
+        console.log(countries);
+      $('#country').material_select();
+        //loop through countries..
+        $.each(countries,function(key,country)
+        {
+            $("<option></option>")
+                            .attr("value",country.code)
+                            .append(country.name)
+                            .appendTo($("#country"));
+           
+        }); 
+        // trigger "change" to fire the #state section update process
+        $("#country").material_select('update');
+        $("#country").trigger("change");
+        
+
+    });
+    
+    $("#country").on("change",function()
+    {
+    
+        countryCode=$("#country").val();
+        
+        // Populate country select box from battuta API
+        url="https://battuta.medunes.net/api/region/"
+        +countryCode
+        +"/all/?key="+BATTUTA_KEY+"&callback=?";
+
+        $.getJSON(url,function(regions)
+        {
+            $("#region option").remove();
+            //loop through regions..
+            $.each(regions,function(key,region)
+            {
+                $("<option></option>")
+                                .attr("value",region.region)
+                                .append(region.region)
+                                .appendTo($("#region"));
+            });
+            // trigger "change" to fire the #state section update process
+            $("#region").material_select('update');
+            $("#region").trigger("change");
+            
+        }); 
+        
+    });
+    $("#region").on("change",function()
+    {
+        
+        // Populate country select box from battuta API
+        countryCode=$("#country").val();
+        region=$("#region").val();
+        url="https://battuta.medunes.net/api/city/"
+        +countryCode
+        +"/search/?region="
+        +region
+        +"&key="
+        +BATTUTA_KEY
+        +"&callback=?";
+        
+        $.getJSON(url,function(cities)
+        {
+            currentCities=cities;
+            var i=0;
+            $("#city option").remove();
+        
+            //loop through regions..
+            $.each(cities,function(key,city)
+            {
+                $("<option></option>")
+                                .attr("value",i++)
+                                .append(city.city)
+                        .appendTo($("#city"));
+            });
+            // trigger "change" to fire the #state section update process
+            $("#city").material_select('update');
+            $("#city").trigger("change");
+            
+        }); 
+        
+    }); 
+    $("#city").on("change",function()
+    {
+      currentIndex=$("#city").val();
+      currentCity=currentCities[currentIndex];
+      city=currentCity.city;
+      region=currentCity.region;
+      country=currentCity.country;
+      lat=currentCity.latitude;
+      lng=currentCity.longitude;
+      $("#location").html('<i class="fa fa-map-marker"></i> <strong> '+city+"/"+region+"</strong>("+lat+","+lng+")");
+    });
+   //-------------------------------END OF SELECT CASCADING-------------------------//
+    </script>
